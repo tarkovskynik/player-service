@@ -1,5 +1,5 @@
 
-#Player Service
+# Player Service
 
 Use command: `git clone https://github.com/tarkovskynik/player-service.git`
 
