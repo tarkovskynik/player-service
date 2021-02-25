@@ -14,6 +14,10 @@ func NewErrorUserHasBeenCreated(id uint64) error {
 	return fmt.Errorf("User with id #%d has been created", id)
 }
 
+func NewErrorNotEnoughMoney(id uint64) error {
+	return fmt.Errorf("User with id #%d does not have enough funds on the balance", id)
+}
+
 type User struct {
 	Id      uint64 `json:"id"`
 	Balance int    `json:"balance"`

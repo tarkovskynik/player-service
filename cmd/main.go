@@ -40,7 +40,7 @@ func main() {
 }
 
 func initConfig() error {
-	viper.AddConfigPath("/home/ubuntu/Documents/apps/player-api/configs")
+	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
 	return viper.ReadInConfig()
 }
