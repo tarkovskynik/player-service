@@ -20,7 +20,7 @@ Use: `make migrate` for migrates
 Build the app: `go build main.go` in terminal or in IDE 
 
 
-##Operations:
+## Operations:
 
 POST - `"/user/create"` - create user
 
@@ -39,7 +39,7 @@ In Postman you choose "Body" menu, POST `localhost:8080/user/create` and type fo
 "token": "testtask"
 }
 
-####Token - with which token the user was created with such a token it will be possible to perform operations on this ID
+#### Token - with which token the user was created with such a token it will be possible to perform operations on this ID
 
 Example of get user:
 In Postman you choose "Body" menu, POST `localhost:8080/user/get` and type for example:
