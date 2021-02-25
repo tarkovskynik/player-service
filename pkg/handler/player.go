@@ -23,9 +23,9 @@ func (h *Handler) createUser(c *gin.Context) {
 		return
 	}
 
-//	id, err := h.repo.Create(input)
-    err := h.cache.Create(&input, &stat)
-    if err != nil {
+	id, err := h.repo.Create(input)
+	err = h.cache.Create(&input, &stat)
+	if err != nil {
 		logrus.WithField("handler", "createUser").Errorf("error: %s", err.Error())
 		c.JSON(http.StatusBadRequest, errorResponse{
 			Error: err.Error(),
@@ -33,15 +33,13 @@ func (h *Handler) createUser(c *gin.Context) {
 		return
 	}
 
-
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": input.Id,
+		"id": id,
 	})
 }
 
 func (h *Handler) getUser(c *gin.Context) {
 	var input player.User
-	//var statistics player.Statistics
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		logrus.WithField("handler", "getUser").Errorf("error: %s", err.Error())
@@ -50,18 +48,21 @@ func (h *Handler) getUser(c *gin.Context) {
 		})
 		return
 	}
-	user, statistic, err := h.cache.Get(input.Id,input.Token)
+	user,err := h.repo.GetById(int(input.Id))
 
-		if err != nil {
-			logrus.WithField("handler", "getUser").Errorf("error: %s", err.Error())
-			c.JSON(http.StatusInternalServerError, errorResponse{
-				Error: err.Error(),
-			})
-			return
-		}
+	//_, statistic, err := h.cache.Get(input.Id, input.Token)
+
+
+	if err != nil {
+		logrus.WithField("handler", "getUser").Errorf("error: %s", err.Error())
+		c.JSON(http.StatusInternalServerError, errorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, user)
-	c.JSON(http.StatusOK, statistic)
+	//c.JSON(http.StatusOK, statistic)
 }
 
 func (h *Handler) addDeposit(c *gin.Context) {
@@ -74,7 +75,7 @@ func (h *Handler) addDeposit(c *gin.Context) {
 		})
 		return
 	}
-	user, statistics, err := h.cache.Get(deposit.UserID,deposit.Token)
+	user, statistics, err := h.cache.Get(deposit.UserID, deposit.Token)
 
 	if err != nil {
 		logrus.WithField("handler", "getUser").Errorf("error: %s", err.Error())
@@ -90,7 +91,7 @@ func (h *Handler) addDeposit(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Balance)
 }
 
-func (h *Handler) transaction(c *gin.Context){
+func (h *Handler) transaction(c *gin.Context) {
 	var transaction player.Transaction
 
 	if err := c.ShouldBindJSON(&transaction); err != nil {
@@ -101,7 +102,7 @@ func (h *Handler) transaction(c *gin.Context){
 		return
 	}
 
-	user, statistics, err := h.cache.Get(transaction.UserID,transaction.Token)
+	user, statistics, err := h.cache.Get(transaction.UserID, transaction.Token)
 
 	if err != nil {
 		logrus.WithField("handler", "getUser").Errorf("error: %s", err.Error())
@@ -120,7 +121,6 @@ func (h *Handler) transaction(c *gin.Context){
 		statistics.BetSum += transaction.Amount
 		user.Balance -= transaction.Amount
 	}
-
 
 	c.JSON(http.StatusOK, user.Balance)
 }

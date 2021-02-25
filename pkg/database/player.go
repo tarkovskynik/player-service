@@ -1,8 +1,8 @@
 package database
 
 import (
-"database/sql"
-"player"
+	"database/sql"
+	"player"
 )
 
 type PlayerRepository struct {
@@ -15,8 +15,8 @@ func NewInvoiceRepository(db *sql.DB) *PlayerRepository {
 
 func (r *PlayerRepository) Create(user player.User) (int, error) {
 	var id int
-	row := r.db.QueryRow("INSERT INTO users(balance, token) VALUES( $1, $2 ) RETURNING id",
-		user.Balance, user.Token)
+	row := r.db.QueryRow("INSERT INTO users(id, balance, token) VALUES( $1, $2, $3) RETURNING id",
+		int(user.Id), user.Balance, user.Token)
 	err := row.Scan(&id)
 	if err != nil {
 		return 0, err

@@ -3,7 +3,7 @@ package main
 import (
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
-	"os"
+	"github.com/spf13/viper"
 	"player/pkg/cache"
 	"player/pkg/database"
 	"player/pkg/handler"
@@ -12,7 +12,18 @@ import (
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 
-	db, err := database.NewPostgresDB(initDBConfig())
+	if err := initConfig(); err != nil {
+		logrus.Fatalf("error initializing configs: %s", err.Error())
+	}
+
+	db, err := database.NewPostgresDB(database.Config{
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
+		Username: viper.GetString("db.username"),
+		Password: viper.GetString("db.password"),
+		DBName:   viper.GetString("db.dbname"),
+		SSLMode:  viper.GetString("db.sslmode"),
+	})
 
 	if err != nil {
 		logrus.Fatalf("Error connecting to Database: %s", err.Error())
@@ -28,43 +39,8 @@ func main() {
 	}
 }
 
-func initDBConfig() database.Config {
-	dbHost := os.Getenv("DB_HOST")
-	if dbHost == "" {
-		dbHost = "localhost"
-	}
-
-	dbPort := os.Getenv("DB_PORT")
-	if dbPort == "" {
-		dbPort = "5432"
-	}
-
-	dbPassword := os.Getenv("DB_PASSWORD")
-	if dbPassword == "" {
-		dbPassword = "qwerty"
-	}
-
-	dbUsername := os.Getenv("DB_USERNAME")
-	if dbUsername == "" {
-		dbUsername = "postgres"
-	}
-
-	dbName := os.Getenv("DB_NAME")
-	if dbName == "" {
-		dbName = "postgres"
-	}
-
-	sslMode := os.Getenv("SSL_MODE")
-	if sslMode == "" {
-		sslMode = "disable"
-	}
-
-	return database.Config{
-		Host:     dbHost,
-		Port:     dbPort,
-		Username: dbUsername,
-		Password: dbPassword,
-		DBName:   dbName,
-		SSLMode:  sslMode,
-	}
+func initConfig() error {
+	viper.AddConfigPath("/home/ubuntu/Documents/apps/player-api/configs")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }

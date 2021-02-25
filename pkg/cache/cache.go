@@ -6,7 +6,7 @@ import (
 )
 
 type Cache struct {
-	data map[uint64]*player.User
+	data  map[uint64]*player.User
 	datas map[uint64]*player.Statistics
 	datad map[uint64]*player.Deposit
 	datat map[uint64]*player.Transaction
@@ -15,17 +15,17 @@ type Cache struct {
 
 func NewCache() *Cache {
 	return &Cache{
-		data: make(map[uint64]*player.User),
+		data:  make(map[uint64]*player.User),
 		datas: make(map[uint64]*player.Statistics),
 		datad: make(map[uint64]*player.Deposit),
 		datat: make(map[uint64]*player.Transaction),
 	}
 }
 
-func (c *Cache) Create(user *player.User, statistics *player.Statistics) error{
+func (c *Cache) Create(user *player.User, statistics *player.Statistics) error {
 
 	_, ok := c.data[user.Id]
-	if ok{
+	if ok {
 		return player.NewErrorUserHasBeenCreated(user.Id)
 	}
 	c.Lock()
@@ -35,20 +35,20 @@ func (c *Cache) Create(user *player.User, statistics *player.Statistics) error{
 	return nil
 }
 
-func (c *Cache) Get(id uint64, token string) (*player.User,*player.Statistics, error) {
+func (c *Cache) Get(id uint64, token string) (*player.User, *player.Statistics, error) {
 	c.Lock()
 	defer c.Unlock()
 
-	user,ok := c.data[id]
+	user, ok := c.data[id]
 
-	if !ok  {
+	if !ok {
 		return &player.User{}, &player.Statistics{}, player.NewErrorUserNotFound(int(id))
 	}
 
 	statistic := c.datas[user.Id]
 
-	if  token != user.Token{
-		return &player.User{}, &player.Statistics{},player.NewErrorTokenNotFound(user.Id)
+	if token != user.Token {
+		return &player.User{}, &player.Statistics{}, player.NewErrorTokenNotFound(user.Id)
 	}
 
 	return user, statistic, nil

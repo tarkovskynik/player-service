@@ -15,7 +15,7 @@ func NewErrorUserHasBeenCreated(id uint64) error {
 }
 
 type User struct {
-	Id          uint64    `json:"id"`
-	Balance     int  `json:"balance"`
-	Token       string  `json:"token"`
+	Id      uint64 `json:"id"`
+	Balance int    `json:"balance"`
+	Token   string `json:"token"`
 }
